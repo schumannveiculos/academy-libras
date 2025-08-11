@@ -58,42 +58,40 @@
 <div id="app"></div>
 
 <script>
-// ---------- VERSIONAMENTO para migrar conteúdo ----------
-const VERSION = "2025-08-11-v3";
+// ---------- VERSION PARA MIGRAÇÃO ----------
+const VERSION = "2025-08-11-fix-videos";
 
-// ---------- DATASETS (vídeos + miniaturas) ----------
+// ---------- HELPERS ----------
 const yt = {
   thumb: (id)=>`https://img.youtube.com/vi/${id}/hqdefault.jpg`,
   url:   (id)=>`https://www.youtube.com/watch?v=${id}`
 };
+const searchUrl = (q)=>`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+const ph = (txt)=>`https://placehold.co/640x360?text=${encodeURIComponent(txt)}`;
 
+// ---------- DATASETS ----------
+// Iniciante mantém vídeos reais (IDs conhecidos)
 const VID = {
   ALFABETO: ["JpFOhTsxyQE","0CjU7Mz8rSU","sntDyFlilGE"],
   NUMEROS:  ["rpuaHaEjn8Q","LkeQqKjxMLc"],
-  SAUDA:    ["IfWxlBxIw1E","0dqiG_o-y_4"],
-  INTER:    ["7wVvQb9lS9I","_4dM1v8iayI","x0HkC4V1oQ8"],
-  AVANC:    ["l3c1l0QeO9o","m2Y0t0k3R5w","C5cQdK3vW1Y"]
+  SAUDA:    ["IfWxlBxIw1E","0dqiG_o-y_4"]
 };
 
-// ---------- INICIANTE ----------
+// INICIANTE
 const ALFABETO = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((ch, i)=>{
   const id = VID.ALFABETO[i % VID.ALFABETO.length];
-  return {
-    id: "alf-"+ch, level:"iniciante", category:"Alfabeto", title:"Letra "+ch,
-    description: "Forme a letra "+ch+" na datilologia (alfabeto manual) da Libras.",
+  return { id:"alf-"+ch, level:"iniciante", category:"Alfabeto", title:"Letra "+ch,
+    description:"Forme a letra "+ch+" na datilologia (alfabeto manual) da Libras.",
     tips:["Punho relaxado","Sem tensão nos dedos","Contato visual"],
-    img: yt.thumb(id), video: yt.url(id)
-  };
+    img: yt.thumb(id), video: yt.url(id) };
 });
 
 const NUMEROS = Array.from({length:11}, (_,n)=>{
   const id = VID.NUMEROS[n % VID.NUMEROS.length];
-  return {
-    id:"num-"+n, level:"iniciante", category:"Números", title:"Número "+n,
+  return { id:"num-"+n, level:"iniciante", category:"Números", title:"Número "+n,
     description:"Representação manual do número "+n+" em Libras.",
     tips:["Pratique sequência 0→10","Atenção à orientação da palma"],
-    img: yt.thumb(id), video: yt.url(id)
-  };
+    img: yt.thumb(id), video: yt.url(id) };
 });
 
 const SAUDACOES = [
@@ -104,81 +102,59 @@ const SAUDACOES = [
   {key:"Tudo bem?", desc:"Pergunta com expressão interrogativa.", tips:["Sobrancelhas leves"], id:VID.SAUDA[1]},
   {key:"Por favor", desc:"Palma no peito em movimento circular.", tips:["Movimento curto"], id:VID.SAUDA[1]},
   {key:"Obrigado(a)", desc:"Mão no queixo indo para frente.", tips:["Olhar no interlocutor"], id:VID.SAUDA[1]}
-].map((s,i)=> ({
-  id:"saud-"+i, level:"iniciante", category:"Saudações", title:s.key,
-  description:s.desc, tips:s.tips, img:yt.thumb(s.id), video:yt.url(s.id)
-}));
+].map((s,i)=> ({ id:"saud-"+i, level:"iniciante", category:"Saudações", title:s.key,
+  description:s.desc, tips:s.tips, img:yt.thumb(s.id), video:yt.url(s.id) }));
 
-// ---------- INTERMEDIÁRIO ----------
+// INTERMEDIÁRIO — corrigido: sem IDs quebrados; usa busca do YouTube e miniatura estável
 const INTERMEDIARIO = [
-  {title:"Classificadores: forma e tamanho", cat:"Classificadores", desc:"Uso de classificadores para descrever objetos e pessoas.", tips:["Combine expressão facial","Pratique variações"], id:VID.INTER[0]},
-  {title:"Verbos direcionais", cat:"Verbos", desc:"Movimento do verbo concordando com sujeito/objeto.", tips:["Direção consistente","Marque o espaço"], id:VID.INTER[1]},
-  {title:"Estrutura de frase (SOV)", cat:"Gramática", desc:"Ordem comum em Libras e topicalização simples.", tips:["Tópico no início","Expressão gramatical"], id:VID.INTER[2]},
-  {title:"Pronomes e apontamentos", cat:"Gramática", desc:"Apontamentos no espaço de sinalização.", tips:["Estabeleça loci","Reutilize o espaço"], id:VID.INTER[2]}
-].map((s,i)=> ({
-  id:"inter-"+i, level:"intermediario", category:s.cat, title:s.title,
-  description:s.desc, tips:s.tips, img:yt.thumb(s.id), video:yt.url(s.id)
-}));
+  {title:"Classificadores: forma e tamanho", cat:"Classificadores", q:"Libras classificadores forma tamanho"},
+  {title:"Verbos direcionais", cat:"Verbos", q:"Libras verbos direcionais direcionalidade"},
+  {title:"Estrutura de frase (SOV)", cat:"Gramática", q:"Libras estrutura de frase SOV topicalização"},
+  {title:"Pronomes e apontamentos", cat:"Gramática", q:"Libras pronomes apontamentos espaço loci"}
+].map((s,i)=> ({ id:"inter-"+i, level:"intermediario", category:s.cat, title:s.title,
+  description:"Aulas sobre "+s.title.toLowerCase()+".", tips:["Observe expressão facial","Pratique variações"],
+  img: ph(s.title), video: searchUrl(s.q) }));
 
-// ---------- AVANÇADO ----------
+// AVANÇADO — corrigido: busca do YouTube + miniatura estável
 const AVANCADO = [
-  {title:"Concordância verbal/nominal", cat:"Sintaxe", desc:"Concordância de pessoa, número e espaço.", tips:["Apoie com expressões","Consistência espacial"], id:VID.AVANC[0]},
-  {title:"Tópico-comentário e foco", cat:"Discurso", desc:"Estratégias de topicalização e foco informacional.", tips:["Pausa no tópico","Sobrancelhas"], id:VID.AVANC[0]},
-  {title:"Coesão e coerência textual", cat:"Discurso", desc:"Uso de conectores, anáforas e referenciação.", tips:["Conecte ideias","Reforce referenciação"], id:VID.AVANC[1]},
-  {title:"Interpretação: técnicas e ética", cat:"Interpretação", desc:"Princípios para interpretar falas e textos em Libras.", tips:["Fidelidade de sentido","Gerenciar velocidade"], id:VID.AVANC[2]}
-].map((s,i)=> ({
-  id:"adv-"+i, level:"avancado", category:s.cat, title:s.title,
-  description:s.desc, tips:s.tips, img:yt.thumb(s.id), video:yt.url(s.id)
-}));
+  {title:"Coesão e coerência textual", cat:"Discurso", q:"Libras coesão coerência textual conectores"},
+  {title:"Tópico-comentário e foco", cat:"Discurso", q:"Libras tópico comentário foco topicalização"},
+  {title:"Interpretação: técnicas e ética", cat:"Interpretação", q:"Interpretação Libras técnicas ética"},
+  {title:"Concordância verbal/nominal", cat:"Sintaxe", q:"Libras concordância verbal nominal espaço"}
+].map((s,i)=> ({ id:"adv-"+i, level:"avancado", category:s.cat, title:s.title,
+  description:"Aulas avançadas de "+s.title.toLowerCase()+".", tips:["Mantenha consistência espacial","Sinalize pausas"],
+  img: ph(s.title), video: searchUrl(s.q) }));
 
-// Banco inicial completo (52 itens)
-const CONTENT = [
-  ...ALFABETO, ...NUMEROS, ...SAUDACOES,   // Iniciante
-  ...INTERMEDIARIO,                         // Intermediário
-  ...AVANCADO                               // Avançado
-];
+const CONTENT = [...ALFABETO, ...NUMEROS, ...SAUDACOES, ...INTERMEDIARIO, ...AVANCADO];
 
-// ---------- STATE / STORAGE ----------
+// ---------- STORAGE & STATE ----------
 const DB = {
   load(key, fallback){ try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch(e){ return fallback } },
   save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
 };
 
-const state = {
-  user: null,
-  view: 'login', // 'login'|'home'|'lesson'|'admin_users'|'profile'
-  levelFilter: 'iniciante',
-  q: '',
-  lessons: [],
-  users: []
-};
+const state = { user:null, view:'login', levelFilter:'iniciante', q:'', lessons:[], users:[] };
 
+// ---------- INIT ----------
 function initData(){
-  // Seed admin
+  // usuários
   const users = DB.load('lms_users', []);
-  if(users.length === 0){
+  if(users.length===0){
     users.push({ id: crypto.randomUUID(), name:'Administrador', email:'admin@academia', pass:'123456', role:'admin', active:true });
     DB.save('lms_users', users);
   }
   state.users = users;
-
-  // MIGRAÇÃO de conteúdo baseada em versão ou tamanho mínimo
-  const currentVersion = localStorage.getItem('lms_version');
-  let lessons = DB.load('lms_content', []);
-  const MIN_EXPECTED = 26 + 11 + 7 + 4 + 4; // 52
-  if(currentVersion !== VERSION || !Array.isArray(lessons) || lessons.length < MIN_EXPECTED){
-    lessons = CONTENT;
-    DB.save('lms_content', lessons);
+  // catálogo com migração
+  const cv = localStorage.getItem('lms_version');
+  if(cv !== VERSION){
+    DB.save('lms_content', CONTENT);
     localStorage.setItem('lms_version', VERSION);
   }
-  state.lessons = lessons;
-
+  state.lessons = DB.load('lms_content', CONTENT);
+  // sessão
   const s = DB.load('lms_session', null);
-  if(s){ state.user = s; state.view='home'; }
+  if(s){ state.user=s; state.view='home'; }
 }
-
-function saveUsers(){ DB.save('lms_users', state.users); }
-function saveLessons(){ DB.save('lms_content', state.lessons); localStorage.setItem('lms_version', VERSION); }
 
 // ---------- AUTH ----------
 function login(email, pass){
@@ -194,18 +170,14 @@ function logout(){ state.user=null; localStorage.removeItem('lms_session'); rout
 // ---------- ROUTER ----------
 function route(view, params={}){
   state.view = view;
-  if(view==='lesson' && params.id){
-    state.current = state.lessons.find(x=>x.id===params.id) || null;
-  }
+  if(view==='lesson' && params.id){ state.current = state.lessons.find(x=>x.id===params.id) || null; }
   render();
 }
 
-// ---------- HELPERS ----------
+// ---------- HELPERS/UI ----------
 const $ = (sel, el=document)=> el.querySelector(sel);
 const $$ = (sel, el=document)=> [...el.querySelectorAll(sel)];
-function labelLevel(l){
-  return l==='iniciante'?'Iniciante' : l==='intermediario'?'Intermediário':'Avançado';
-}
+function labelLevel(l){ return l==='iniciante'?'Iniciante': l==='intermediario'?'Intermediário':'Avançado'; }
 function filtered(){
   const q = state.q.toLowerCase();
   return state.lessons
@@ -214,7 +186,6 @@ function filtered(){
     .sort((a,b)=> a.category.localeCompare(b.category) || a.title.localeCompare(b.title));
 }
 
-// ---------- UI ----------
 function Sidebar(){
   const u = state.user;
   const admin = u?.role==='admin' ? `
@@ -255,7 +226,7 @@ function Home(){
           <h2 style="margin:0">Plano de estudo — <span class="muted">${labelLevel(state.levelFilter)}</span></h2>
           <span class="pill">Itens: ${filtered().length}</span>
         </div>
-        <p class="muted" style="margin-top:8px">Clique em um cartão para abrir a lição. Use <span class="kbd">Buscar</span> para filtrar por palavra. As imagens são miniaturas dos vídeos-aula.</p>
+        <p class="muted" style="margin-top:8px">Clique em um cartão para abrir a lição. Use <span class="kbd">Buscar</span> para filtrar por palavra. As imagens são miniaturas/ilustrações do tema.</p>
       </div>
       <div class="bd">
         <div class="list" id="list">${items}</div>
@@ -291,7 +262,7 @@ function Lesson(){
           <div class="card"><div class="bd"><strong>Descrição</strong><p class="muted" style="margin:6px 0 0">${l.description}</p></div></div>
           <div class="card"><div class="bd"><strong>Dicas</strong><ul class="muted" style="margin:6px 0 0">${(l.tips||[]).map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
           <div class="row">
-            <a class="btn primary" href="${l.video}" target="_blank" rel="noopener">▶️ Assistir vídeo-aula</a>
+            <a class="btn primary" href="${l.video}" target="_blank" rel="noopener">▶️ Abrir busca de vídeo</a>
             <button class="btn" onclick="prev()">⏮️ Anterior</button>
             <button class="btn" onclick="next()">⏭️ Próxima</button>
           </div>
@@ -311,7 +282,6 @@ function Lesson(){
   </main>`;
 }
 
-// Admin
 function AdminUsers(){
   const rows = state.users.map(u=>`
     <div class="tile" style="flex-direction:row; align-items:center">
@@ -334,17 +304,10 @@ function AdminUsers(){
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px">
         <div><input id="uName" placeholder="Nome"/></div>
         <div><input id="uEmail" placeholder="E-mail (login)"/></div>
-        <div><input id="uPass" placeholder="Senha inicial"/></div>
-        <div>
-          <select id="uRole">
-            <option value="student">Aluno</option>
-            <option value="admin">Administrador</option>
-          </select>
-        </div>
       </div>
       <div class="row" style="margin-top:10px">
         <button class="btn primary" onclick="createUser()">➕ Cadastrar</button>
-        <button class="btn" onclick="upgradeCatalog()">🔄 Atualizar catálogo (forçar)</button>
+        <button class="btn" onclick="upgradeCatalog()">🔄 Atualizar catálogo</button>
       </div>
       <div class="bd" style="padding:0; margin-top:10px">
         ${rows}
@@ -375,7 +338,6 @@ function LoginView(){
       <p class="muted">Acesso restrito. <b>Somente o admin</b> cadastra/altera alunos.</p>
       <div class="row" style="margin-top:12px"><input id="lEmail" placeholder="E-mail" value="admin@academia"/><input id="lPass" type="password" value="123456"/></div>
       <div class="row" style="margin-top:10px"><button class="btn primary" onclick="doLogin()">Entrar</button></div>
-      <p class="muted" style="margin-top:8px">Dica: altere a senha do admin em <b>Perfil</b>.</p>
     </div>
   </div>`;
 }
@@ -390,31 +352,21 @@ function showStatus(id){
   const msgs=[]; if(done.includes(id)) msgs.push('✅ Concluída'); if(fav.includes(id)) msgs.push('🔖 Favorita');
   $('#statusMsg').textContent = msgs.join(' • ');
 }
-function prev(){
-  const list = filtered(); const i = list.findIndex(x=>x.id===state.current.id);
-  if(i>0) route('lesson',{id:list[i-1].id});
-}
-function next(){
-  const list = filtered(); const i = list.findIndex(x=>x.id===state.current.id);
-  if(i<list.length-1) route('lesson',{id:list[i+1].id});
-}
+function prev(){ const list = filtered(); const i = list.findIndex(x=>x.id===state.current.id); if(i>0) route('lesson',{id:list[i-1].id}); }
+function next(){ const list = filtered(); const i = list.findIndex(x=>x.id===state.current.id); if(i<list.length-1) route('lesson',{id:list[i+1].id}); }
 // Admin users
 function createUser(){
-  const name=$('#uName').value.trim(), email=$('#uEmail').value.trim(), pass=$('#uPass').value.trim(), role=$('#uRole').value;
-  if(!name||!email||!pass){ alert('Preencha nome, e-mail e senha.'); return; }
+  const name=$('#uName').value.trim(), email=$('#uEmail').value.trim();
+  if(!name||!email){ alert('Preencha nome e e-mail.'); return; }
   if(state.users.some(u=>u.email.toLowerCase()===email.toLowerCase())){ alert('Já existe usuário com este e-mail.'); return; }
-  state.users.push({ id: crypto.randomUUID(), name, email, pass, role, active:true });
-  saveUsers(); render();
+  state.users.push({ id: crypto.randomUUID(), name, email, pass:'libras123', role:'student', active:true });
+  DB.save('lms_users', state.users); render();
 }
-function toggleActive(id){ const u=state.users.find(x=>x.id===id); if(!u) return; u.active=!u.active; saveUsers(); render(); }
-function resetPass(id){ const u=state.users.find(x=>x.id===id); if(!u) return; const np=prompt('Nova senha para '+u.email); if(!np) return; u.pass=np; saveUsers(); render(); }
-function removeUser(id){ if(!confirm('Remover usuário?')) return; state.users = state.users.filter(u=>u.id!==id); saveUsers(); render(); }
-function saveProfile(){ const u=state.users.find(x=>x.id===state.user.id); if(!u) return; const n=$('#pName').value.trim(), p=$('#pPass').value.trim(); if(n) {u.name=n; state.user.name=n;} if(p){u.pass=p;} saveUsers(); DB.save('lms_session', state.user); alert('Perfil atualizado.'); }
-function upgradeCatalog(){
-  if(!confirm('Substituir catálogo local por nova versão?')) return;
-  DB.save('lms_content', CONTENT); localStorage.setItem('lms_version', VERSION);
-  state.lessons = CONTENT; render(); alert('Catálogo atualizado!');
-}
+function toggleActive(id){ const u=state.users.find(x=>x.id===id); if(!u) return; u.active=!u.active; DB.save('lms_users', state.users); render(); }
+function resetPass(id){ const u=state.users.find(x=>x.id===id); if(!u) return; const np=prompt('Nova senha para '+u.email); if(!np) return; u.pass=np; DB.save('lms_users', state.users); render(); }
+function removeUser(id){ if(!confirm('Remover usuário?')) return; state.users = state.users.filter(u=>u.id!==id); DB.save('lms_users', state.users); render(); }
+function saveProfile(){ const u=state.users.find(x=>x.id===state.user.id); if(!u) return; const n=$('#pName').value.trim(), p=$('#pPass').value.trim(); if(n){u.name=n; state.user.name=n;} if(p){u.pass=p;} DB.save('lms_users', state.users); DB.save('lms_session', state.user); alert('Perfil atualizado.'); }
+function upgradeCatalog(){ DB.save('lms_content', CONTENT); localStorage.setItem('lms_version', VERSION); state.lessons = CONTENT; render(); alert('Catálogo atualizado!'); }
 
 // ---------- RENDER ----------
 function SidebarActivate(){
@@ -426,6 +378,7 @@ function SidebarActivate(){
   if($('#m_home') && state.view==='home') $('#m_home').classList.add('active');
   if($('#m_profile') && state.view==='profile') $('#m_profile').classList.add('active');
   if($('#m_users') && state.view==='admin_users') $('#m_users').classList.add('active');
+  if($('#m_upgrade')) $('#m_upgrade').classList.add('active');
 }
 function render(){
   const root = document.getElementById('app');
