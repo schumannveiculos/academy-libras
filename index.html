@@ -58,6 +58,9 @@
 <div id="app"></div>
 
 <script>
+// ---------- VERSIONAMENTO para migrar conteúdo ----------
+const VERSION = "2025-08-11-v3";
+
 // ---------- DATASETS (vídeos + miniaturas) ----------
 const yt = {
   thumb: (id)=>`https://img.youtube.com/vi/${id}/hqdefault.jpg`,
@@ -128,7 +131,7 @@ const AVANCADO = [
   description:s.desc, tips:s.tips, img:yt.thumb(s.id), video:yt.url(s.id)
 }));
 
-// Banco inicial
+// Banco inicial completo (52 itens)
 const CONTENT = [
   ...ALFABETO, ...NUMEROS, ...SAUDACOES,   // Iniciante
   ...INTERMEDIARIO,                         // Intermediário
@@ -159,19 +162,23 @@ function initData(){
   }
   state.users = users;
 
-  // Seed content if empty
-  const lessons = DB.load('lms_content', []);
-  if(lessons.length === 0){
-    DB.save('lms_content', CONTENT);
+  // MIGRAÇÃO de conteúdo baseada em versão ou tamanho mínimo
+  const currentVersion = localStorage.getItem('lms_version');
+  let lessons = DB.load('lms_content', []);
+  const MIN_EXPECTED = 26 + 11 + 7 + 4 + 4; // 52
+  if(currentVersion !== VERSION || !Array.isArray(lessons) || lessons.length < MIN_EXPECTED){
+    lessons = CONTENT;
+    DB.save('lms_content', lessons);
+    localStorage.setItem('lms_version', VERSION);
   }
-  state.lessons = DB.load('lms_content', []);
+  state.lessons = lessons;
 
   const s = DB.load('lms_session', null);
   if(s){ state.user = s; state.view='home'; }
 }
 
 function saveUsers(){ DB.save('lms_users', state.users); }
-function saveLessons(){ DB.save('lms_content', state.lessons); }
+function saveLessons(){ DB.save('lms_content', state.lessons); localStorage.setItem('lms_version', VERSION); }
 
 // ---------- AUTH ----------
 function login(email, pass){
@@ -214,6 +221,7 @@ function Sidebar(){
   <div class="badge" style="margin-top:12px">Admin</div>
   <div class="menu">
     <button onclick="route('admin_users')" id="m_users">👥 Alunos</button>
+    <button onclick="upgradeCatalog()" id="m_upgrade">🔄 Atualizar catálogo</button>
   </div>` : '';
   return `
   <aside class="sidebar">
@@ -303,7 +311,7 @@ function Lesson(){
   </main>`;
 }
 
-// Admin (somente gestão de usuários neste protótipo)
+// Admin
 function AdminUsers(){
   const rows = state.users.map(u=>`
     <div class="tile" style="flex-direction:row; align-items:center">
@@ -336,6 +344,7 @@ function AdminUsers(){
       </div>
       <div class="row" style="margin-top:10px">
         <button class="btn primary" onclick="createUser()">➕ Cadastrar</button>
+        <button class="btn" onclick="upgradeCatalog()">🔄 Atualizar catálogo (forçar)</button>
       </div>
       <div class="bd" style="padding:0; margin-top:10px">
         ${rows}
@@ -401,6 +410,11 @@ function toggleActive(id){ const u=state.users.find(x=>x.id===id); if(!u) return
 function resetPass(id){ const u=state.users.find(x=>x.id===id); if(!u) return; const np=prompt('Nova senha para '+u.email); if(!np) return; u.pass=np; saveUsers(); render(); }
 function removeUser(id){ if(!confirm('Remover usuário?')) return; state.users = state.users.filter(u=>u.id!==id); saveUsers(); render(); }
 function saveProfile(){ const u=state.users.find(x=>x.id===state.user.id); if(!u) return; const n=$('#pName').value.trim(), p=$('#pPass').value.trim(); if(n) {u.name=n; state.user.name=n;} if(p){u.pass=p;} saveUsers(); DB.save('lms_session', state.user); alert('Perfil atualizado.'); }
+function upgradeCatalog(){
+  if(!confirm('Substituir catálogo local por nova versão?')) return;
+  DB.save('lms_content', CONTENT); localStorage.setItem('lms_version', VERSION);
+  state.lessons = CONTENT; render(); alert('Catálogo atualizado!');
+}
 
 // ---------- RENDER ----------
 function SidebarActivate(){
