@@ -59,80 +59,81 @@
 
 <script>
 // ---------- DATASETS (vídeos + miniaturas) ----------
-// Fontes de vídeo abertas (IFES CEFOR e canais educativos no YouTube)
-// Thumbnails: https://img.youtube.com/vi/<ID>/hqdefault.jpg
-
-const VID = {
-  ALFABETO: [
-    // IFES CEFOR (alfabeto completo)
-    {title:"Alfabeto em Libras (IFES/CEFOR)", id:"JpFOhTsxyQE", by:"IFES CEFOR"},
-    // Série Hugo Ensina (Hand Talk)
-    {title:"#HugoEnsina01 — Alfabeto", id:"0CjU7Mz8rSU", by:"Hand Talk"},
-    // Tutorial completo
-    {title:"Alphabet in Libras (Complete)", id:"sntDyFlilGE", by:"Academia de Libras"}
-  ],
-  NUMEROS: [
-    {title:"Números em Libras 0–10", id:"rpuaHaEjn8Q", by:"Canal Educacional"},
-    {title:"Números 0–9 (infantil)", id:"LkeQqKjxMLc", by:"Infantix"}
-  ],
-  SAUDACOES: [
-    {title:"Saudações em Libras (IFES/CEFOR)", id:"IfWxlBxIw1E", by:"IFES CEFOR"},
-    {title:"Saudações — Hugo Ensina", id:"0dqiG_o-y_4", by:"Hand Talk"}
-  ]
+const yt = {
+  thumb: (id)=>`https://img.youtube.com/vi/${id}/hqdefault.jpg`,
+  url:   (id)=>`https://www.youtube.com/watch?v=${id}`
 };
 
-// Mapeia letras A–Z com vídeos e thumbs estáveis
+const VID = {
+  ALFABETO: ["JpFOhTsxyQE","0CjU7Mz8rSU","sntDyFlilGE"],
+  NUMEROS:  ["rpuaHaEjn8Q","LkeQqKjxMLc"],
+  SAUDA:    ["IfWxlBxIw1E","0dqiG_o-y_4"],
+  INTER:    ["7wVvQb9lS9I","_4dM1v8iayI","x0HkC4V1oQ8"],
+  AVANC:    ["l3c1l0QeO9o","m2Y0t0k3R5w","C5cQdK3vW1Y"]
+};
+
+// ---------- INICIANTE ----------
 const ALFABETO = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((ch, i)=>{
-  const v = VID.ALFABETO[i % VID.ALFABETO.length];
+  const id = VID.ALFABETO[i % VID.ALFABETO.length];
   return {
-    id: "alf-"+ch,
-    level: "iniciante",
-    category: "Alfabeto",
-    title: "Letra " + ch,
-    description: "Forme a letra " + ch + " na datilologia (alfabeto manual) da Libras. Observe a posição do polegar, orientação da palma e dedos.",
-    tips: ["Mantenha o punho relaxado", "Evite tensão nos dedos", "Olhe para o interlocutor"],
-    img: "https://img.youtube.com/vi/"+v.id+"/hqdefault.jpg",
-    video: "https://www.youtube.com/watch?v="+v.id
+    id: "alf-"+ch, level:"iniciante", category:"Alfabeto", title:"Letra "+ch,
+    description: "Forme a letra "+ch+" na datilologia (alfabeto manual) da Libras.",
+    tips:["Punho relaxado","Sem tensão nos dedos","Contato visual"],
+    img: yt.thumb(id), video: yt.url(id)
   };
 });
 
-// Números 0–10
 const NUMEROS = Array.from({length:11}, (_,n)=>{
-  const v = VID.NUMEROS[n % VID.NUMEROS.length];
+  const id = VID.NUMEROS[n % VID.NUMEROS.length];
   return {
-    id: "num-"+n,
-    level: "iniciante",
-    category: "Números",
-    title: "Número "+n,
-    description: "Representação manual do número "+n+" em Libras. Observe configuração de mão e movimento.",
-    tips: ["Pratique sequência 0→10", "Atenção à orientação da palma"],
-    img: "https://img.youtube.com/vi/"+v.id+"/hqdefault.jpg",
-    video: "https://www.youtube.com/watch?v="+v.id
+    id:"num-"+n, level:"iniciante", category:"Números", title:"Número "+n,
+    description:"Representação manual do número "+n+" em Libras.",
+    tips:["Pratique sequência 0→10","Atenção à orientação da palma"],
+    img: yt.thumb(id), video: yt.url(id)
   };
 });
 
-// Saudações principais
 const SAUDACOES = [
-  {key:"Olá", desc:"Mão aberta em leve aceno.", tips:["Movimento curto","Expressão amigável"], vid: VID.SAUDACOES[0]},
-  {key:"Bom dia", desc:"Mão saindo da boca para frente.", tips:["Movimento suave"], vid: VID.SAUDACOES[0]},
-  {key:"Boa tarde", desc:"Varia conforme região; gesto de cumprimento à tarde.", tips:["Expressão facial adequada"], vid: VID.SAUDACOES[0]},
-  {key:"Boa noite", desc:"Encerramento do dia; gesto de saudação.", tips:["Movimento contido"], vid: VID.SAUDACOES[0]},
-  {key:"Tudo bem?", desc:"Pergunta com expressão facial interrogativa.", tips:["Sobrancelhas levemente erguidas"], vid: VID.SAUDACOES[1]},
-  {key:"Por favor", desc:"Palma no peito em movimento circular.", tips:["Movimento curto e claro"], vid: VID.SAUDACOES[1]},
-  {key:"Obrigado(a)", desc:"Mão no queixo indo para frente.", tips:["Mantenha o olhar no interlocutor"], vid: VID.SAUDACOES[1]}
+  {key:"Olá", desc:"Mão aberta em leve aceno.", tips:["Movimento curto","Expressão amigável"], id:VID.SAUDA[0]},
+  {key:"Bom dia", desc:"Mão saindo da boca para frente.", tips:["Movimento suave"], id:VID.SAUDA[0]},
+  {key:"Boa tarde", desc:"Saudação da tarde.", tips:["Expressão facial adequada"], id:VID.SAUDA[0]},
+  {key:"Boa noite", desc:"Saudação da noite.", tips:["Movimento contido"], id:VID.SAUDA[0]},
+  {key:"Tudo bem?", desc:"Pergunta com expressão interrogativa.", tips:["Sobrancelhas leves"], id:VID.SAUDA[1]},
+  {key:"Por favor", desc:"Palma no peito em movimento circular.", tips:["Movimento curto"], id:VID.SAUDA[1]},
+  {key:"Obrigado(a)", desc:"Mão no queixo indo para frente.", tips:["Olhar no interlocutor"], id:VID.SAUDA[1]}
 ].map((s,i)=> ({
-  id: "saud-"+i,
-  level: "iniciante",
-  category: "Saudações",
-  title: s.key,
-  description: s.desc,
-  tips: s.tips,
-  img: "https://img.youtube.com/vi/"+s.vid.id+"/hqdefault.jpg",
-  video: "https://www.youtube.com/watch?v="+s.vid.id
+  id:"saud-"+i, level:"iniciante", category:"Saudações", title:s.key,
+  description:s.desc, tips:s.tips, img:yt.thumb(s.id), video:yt.url(s.id)
+}));
+
+// ---------- INTERMEDIÁRIO ----------
+const INTERMEDIARIO = [
+  {title:"Classificadores: forma e tamanho", cat:"Classificadores", desc:"Uso de classificadores para descrever objetos e pessoas.", tips:["Combine expressão facial","Pratique variações"], id:VID.INTER[0]},
+  {title:"Verbos direcionais", cat:"Verbos", desc:"Movimento do verbo concordando com sujeito/objeto.", tips:["Direção consistente","Marque o espaço"], id:VID.INTER[1]},
+  {title:"Estrutura de frase (SOV)", cat:"Gramática", desc:"Ordem comum em Libras e topicalização simples.", tips:["Tópico no início","Expressão gramatical"], id:VID.INTER[2]},
+  {title:"Pronomes e apontamentos", cat:"Gramática", desc:"Apontamentos no espaço de sinalização.", tips:["Estabeleça loci","Reutilize o espaço"], id:VID.INTER[2]}
+].map((s,i)=> ({
+  id:"inter-"+i, level:"intermediario", category:s.cat, title:s.title,
+  description:s.desc, tips:s.tips, img:yt.thumb(s.id), video:yt.url(s.id)
+}));
+
+// ---------- AVANÇADO ----------
+const AVANCADO = [
+  {title:"Concordância verbal/nominal", cat:"Sintaxe", desc:"Concordância de pessoa, número e espaço.", tips:["Apoie com expressões","Consistência espacial"], id:VID.AVANC[0]},
+  {title:"Tópico-comentário e foco", cat:"Discurso", desc:"Estratégias de topicalização e foco informacional.", tips:["Pausa no tópico","Sobrancelhas"], id:VID.AVANC[0]},
+  {title:"Coesão e coerência textual", cat:"Discurso", desc:"Uso de conectores, anáforas e referenciação.", tips:["Conecte ideias","Reforce referenciação"], id:VID.AVANC[1]},
+  {title:"Interpretação: técnicas e ética", cat:"Interpretação", desc:"Princípios para interpretar falas e textos em Libras.", tips:["Fidelidade de sentido","Gerenciar velocidade"], id:VID.AVANC[2]}
+].map((s,i)=> ({
+  id:"adv-"+i, level:"avancado", category:s.cat, title:s.title,
+  description:s.desc, tips:s.tips, img:yt.thumb(s.id), video:yt.url(s.id)
 }));
 
 // Banco inicial
-const CONTENT = [...ALFABETO, ...NUMEROS, ...SAUDACOES];
+const CONTENT = [
+  ...ALFABETO, ...NUMEROS, ...SAUDACOES,   // Iniciante
+  ...INTERMEDIARIO,                         // Intermediário
+  ...AVANCADO                               // Avançado
+];
 
 // ---------- STATE / STORAGE ----------
 const DB = {
@@ -142,7 +143,7 @@ const DB = {
 
 const state = {
   user: null,
-  view: 'login', // 'login'|'home'|'lesson'|'admin_users'
+  view: 'login', // 'login'|'home'|'lesson'|'admin_users'|'profile'
   levelFilter: 'iniciante',
   q: '',
   lessons: [],
@@ -195,17 +196,15 @@ function route(view, params={}){
 // ---------- HELPERS ----------
 const $ = (sel, el=document)=> el.querySelector(sel);
 const $$ = (sel, el=document)=> [...el.querySelectorAll(sel)];
-function labelLevel(l){ return l==='iniciante'?'Iniciante':'Intermediário/Avançado'; }
+function labelLevel(l){
+  return l==='iniciante'?'Iniciante' : l==='intermediario'?'Intermediário':'Avançado';
+}
 function filtered(){
   const q = state.q.toLowerCase();
   return state.lessons
     .filter(l=>l.level===state.levelFilter)
     .filter(l=> !q || l.title.toLowerCase().includes(q) || l.category.toLowerCase().includes(q))
     .sort((a,b)=> a.category.localeCompare(b.category) || a.title.localeCompare(b.title));
-}
-function thumbOf(videoUrl){
-  const id = (videoUrl.split('v=')[1]||'').split('&')[0];
-  return "https://img.youtube.com/vi/"+id+"/hqdefault.jpg";
 }
 
 // ---------- UI ----------
@@ -226,9 +225,11 @@ function Sidebar(){
       <button onclick="logout()">🚪 Sair</button>
     </div>
     ${admin}
-    <div class="badge" style="margin-top:12px">Filtros</div>
+    <div class="badge" style="margin-top:12px">Níveis</div>
     <div class="levels" id="lvlBtns" style="margin-top:8px">
       <button data-l="iniciante">Iniciante</button>
+      <button data-l="intermediario">Intermediário</button>
+      <button data-l="avancado">Avançado</button>
     </div>
     <div class="search" style="margin-top:10px">
       <input id="q" placeholder="Buscar por título ou categoria" value="${state.q}"/>
@@ -302,7 +303,7 @@ function Lesson(){
   </main>`;
 }
 
-// Admin
+// Admin (somente gestão de usuários neste protótipo)
 function AdminUsers(){
   const rows = state.users.map(u=>`
     <div class="tile" style="flex-direction:row; align-items:center">
