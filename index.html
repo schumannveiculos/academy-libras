@@ -1,400 +1,132 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Academia de Libras — Catálogo Interativo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#0b0f14; --surface:#0e151f; --muted:#8aa0b4; --text:#e6eef7;
-      --primary:#7dd3fc; --primary2:#60a5fa; --accent:#34d399; --danger:#ef4444; --warn:#f59e0b;
-      --border:#1b2636;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academia Libras</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
+    header { background: #0073e6; color: #fff; padding: 10px 20px; text-align: center; }
+    nav { background: #333; color: #fff; display: flex; justify-content: space-around; padding: 10px; }
+    nav a { color: #fff; text-decoration: none; padding: 5px 10px; }
+    nav a:hover { background: #555; }
+    .container { padding: 20px; }
+    .card { background: #fff; border-radius: 5px; margin-bottom: 15px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .card h3 { margin-top: 0; }
+    .video-thumb { width: 100%; max-width: 320px; }
+    .planos { display: flex; gap: 20px; }
+    .plano { background: #fff; padding: 15px; border-radius: 5px; flex: 1; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .plano button { background: #0073e6; color: #fff; border: none; padding: 10px; cursor: pointer; border-radius: 5px; }
+</style>
+<script>
+let aluno = { nome: '', email: '', plano: '', credencial: '' };
+
+function comprar(plano) {
+    let nome = prompt("Digite seu nome:");
+    let email = prompt("Digite seu email:");
+    if(nome && email) {
+        aluno.nome = nome;
+        aluno.email = email;
+        aluno.plano = plano;
+        aluno.credencial = "LIB-" + Math.floor(Math.random()*1000000);
+        alert("Compra confirmada!\nPlano: " + plano + "\nCredencial: " + aluno.credencial);
+        mostrarAssinatura();
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
-    a{color:inherit}
-    .app{display:grid; grid-template-columns: 280px 1fr; min-height:100vh}
-    .sidebar{background:linear-gradient(180deg,#0f1722 0%, #0a1018 100%); border-right:1px solid var(--border); padding:16px; position:sticky; top:0; height:100vh; overflow:auto}
-    .logo{font-weight:800; letter-spacing:.5px; display:flex; align-items:center; gap:10px; margin-bottom:14px}
-    .logo span{display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#061826; font-weight:900}
-    .badge{padding:6px 10px;border:1px solid #1f2b3a;background:#0d131b;border-radius:999px;color:var(--muted);font-size:12px}
-    .menu button{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:6px 0;border-radius:10px;color:#cfe5fb;text-decoration:none;border:1px solid transparent;background:transparent;cursor:pointer;width:100%; text-align:left}
-    .menu button.active{background:#0c1521;border:1px solid #1e2b45}
-    .content{padding:18px}
-    .grid{display:grid; grid-template-columns: 1fr; gap:16px}
-    @media(min-width:1000px){ .grid{grid-template-columns: 1.1fr .9fr} }
-    .card{background:linear-gradient(180deg,#0e151f 0%, #0a1018 100%); border:1px solid var(--border); border-radius:18px; box-shadow: 0 10px 30px rgba(0,0,0,.35)}
-    .hd{padding:16px 16px 0}
-    .bd{padding:16px}
-    .pill{padding:6px 10px;background:#0a121c;border:1px solid #1a2332;border-radius:12px;font-size:13px;color:#b4cbe1;display:inline-flex; gap:6px; align-items:center}
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .levels{display:flex; gap:8px; flex-wrap:wrap}
-    .levels button{padding:8px 10px; border-radius:999px; border:1px solid #22324a; background:#0c1422; color:#b9d2eb; cursor:pointer}
-    .levels button.active{background:linear-gradient(90deg,#7dd3fc,#60a5fa); color:#06213a; border-color:transparent; font-weight:800}
-    .list{display:grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap:14px}
-    .tile{border:1px solid #1b2740; background:#0f1726; border-radius:14px; overflow:hidden; display:flex; flex-direction:column}
-    .thumb{aspect-ratio: 16/9; background:#0b111a; display:flex; align-items:center; justify-content:center; overflow:hidden}
-    .thumb img{width:100%; height:100%; object-fit:cover}
-    .tile .meta{padding:10px 12px; display:flex; flex-direction:column; gap:6px}
-    .title{font-weight:700}
-    .muted{color:#9fb4c7; font-size:14px}
-    .tag{font-size:12px; color:#9fc5f5; border:1px solid #21406e; padding:2px 8px; border-radius:999px}
-    .actions{display:flex; gap:8px}
-    .btn{appearance:none;border:none;border-radius:10px;padding:8px 10px;background:#0d1626;color:#d9e7f5;font-weight:700;border:1px solid #22334f;cursor:pointer}
-    .btn.primary{background:linear-gradient(90deg, var(--primary), var(--primary2)); color:#082137; border-color:transparent}
-    .btn.ghost{background:#0d141f;color:#b5d1ea;border:1px solid #1e2d46}
-    .btn.small{padding:6px 8px;font-size:12px}
-    .search{display:flex; gap:8px; align-items:center}
-    input,select{padding:10px 12px;border-radius:10px;border:1px solid #1c2a40;background:#0a1321;color:#dfefff}
-    .rightbar{display:grid; gap:12px}
-    .kbd{border:1px solid #1f2a3d;background:#0d1727;border-radius:8px;padding:2px 6px;font-size:12px;color:#b6c9df}
-    .login-wrap{max-width:440px; margin:10vh auto; padding:24px}
-  </style>
+}
+
+function mostrarAssinatura() {
+    const area = document.getElementById("assinatura");
+    if(aluno.nome) {
+        area.innerHTML = "<h3>Minha Assinatura</h3>" +
+                         "<p>Nome: " + aluno.nome + "</p>" +
+                         "<p>Email: " + aluno.email + "</p>" +
+                         "<p>Plano: " + aluno.plano + "</p>" +
+                         "<p>Credencial: " + aluno.credencial + "</p>";
+    }
+}
+</script>
 </head>
 <body>
-<div id="app"></div>
-
-<script>
-// ---------- VERSION PARA MIGRAÇÃO ----------
-const VERSION = "2025-08-11-fix-videos";
-
-// ---------- HELPERS ----------
-const yt = {
-  thumb: (id)=>`https://img.youtube.com/vi/${id}/hqdefault.jpg`,
-  url:   (id)=>`https://www.youtube.com/watch?v=${id}`
-};
-const searchUrl = (q)=>`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
-const ph = (txt)=>`https://placehold.co/640x360?text=${encodeURIComponent(txt)}`;
-
-// ---------- DATASETS ----------
-// Iniciante mantém vídeos reais (IDs conhecidos)
-const VID = {
-  ALFABETO: ["JpFOhTsxyQE","0CjU7Mz8rSU","sntDyFlilGE"],
-  NUMEROS:  ["rpuaHaEjn8Q","LkeQqKjxMLc"],
-  SAUDA:    ["IfWxlBxIw1E","0dqiG_o-y_4"]
-};
-
-// INICIANTE
-const ALFABETO = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((ch, i)=>{
-  const id = VID.ALFABETO[i % VID.ALFABETO.length];
-  return { id:"alf-"+ch, level:"iniciante", category:"Alfabeto", title:"Letra "+ch,
-    description:"Forme a letra "+ch+" na datilologia (alfabeto manual) da Libras.",
-    tips:["Punho relaxado","Sem tensão nos dedos","Contato visual"],
-    img: yt.thumb(id), video: yt.url(id) };
-});
-
-const NUMEROS = Array.from({length:11}, (_,n)=>{
-  const id = VID.NUMEROS[n % VID.NUMEROS.length];
-  return { id:"num-"+n, level:"iniciante", category:"Números", title:"Número "+n,
-    description:"Representação manual do número "+n+" em Libras.",
-    tips:["Pratique sequência 0→10","Atenção à orientação da palma"],
-    img: yt.thumb(id), video: yt.url(id) };
-});
-
-const SAUDACOES = [
-  {key:"Olá", desc:"Mão aberta em leve aceno.", tips:["Movimento curto","Expressão amigável"], id:VID.SAUDA[0]},
-  {key:"Bom dia", desc:"Mão saindo da boca para frente.", tips:["Movimento suave"], id:VID.SAUDA[0]},
-  {key:"Boa tarde", desc:"Saudação da tarde.", tips:["Expressão facial adequada"], id:VID.SAUDA[0]},
-  {key:"Boa noite", desc:"Saudação da noite.", tips:["Movimento contido"], id:VID.SAUDA[0]},
-  {key:"Tudo bem?", desc:"Pergunta com expressão interrogativa.", tips:["Sobrancelhas leves"], id:VID.SAUDA[1]},
-  {key:"Por favor", desc:"Palma no peito em movimento circular.", tips:["Movimento curto"], id:VID.SAUDA[1]},
-  {key:"Obrigado(a)", desc:"Mão no queixo indo para frente.", tips:["Olhar no interlocutor"], id:VID.SAUDA[1]}
-].map((s,i)=> ({ id:"saud-"+i, level:"iniciante", category:"Saudações", title:s.key,
-  description:s.desc, tips:s.tips, img:yt.thumb(s.id), video:yt.url(s.id) }));
-
-// INTERMEDIÁRIO — corrigido: sem IDs quebrados; usa busca do YouTube e miniatura estável
-const INTERMEDIARIO = [
-  {title:"Classificadores: forma e tamanho", cat:"Classificadores", q:"Libras classificadores forma tamanho"},
-  {title:"Verbos direcionais", cat:"Verbos", q:"Libras verbos direcionais direcionalidade"},
-  {title:"Estrutura de frase (SOV)", cat:"Gramática", q:"Libras estrutura de frase SOV topicalização"},
-  {title:"Pronomes e apontamentos", cat:"Gramática", q:"Libras pronomes apontamentos espaço loci"}
-].map((s,i)=> ({ id:"inter-"+i, level:"intermediario", category:s.cat, title:s.title,
-  description:"Aulas sobre "+s.title.toLowerCase()+".", tips:["Observe expressão facial","Pratique variações"],
-  img: ph(s.title), video: searchUrl(s.q) }));
-
-// AVANÇADO — corrigido: busca do YouTube + miniatura estável
-const AVANCADO = [
-  {title:"Coesão e coerência textual", cat:"Discurso", q:"Libras coesão coerência textual conectores"},
-  {title:"Tópico-comentário e foco", cat:"Discurso", q:"Libras tópico comentário foco topicalização"},
-  {title:"Interpretação: técnicas e ética", cat:"Interpretação", q:"Interpretação Libras técnicas ética"},
-  {title:"Concordância verbal/nominal", cat:"Sintaxe", q:"Libras concordância verbal nominal espaço"}
-].map((s,i)=> ({ id:"adv-"+i, level:"avancado", category:s.cat, title:s.title,
-  description:"Aulas avançadas de "+s.title.toLowerCase()+".", tips:["Mantenha consistência espacial","Sinalize pausas"],
-  img: ph(s.title), video: searchUrl(s.q) }));
-
-const CONTENT = [...ALFABETO, ...NUMEROS, ...SAUDACOES, ...INTERMEDIARIO, ...AVANCADO];
-
-// ---------- STORAGE & STATE ----------
-const DB = {
-  load(key, fallback){ try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch(e){ return fallback } },
-  save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
-};
-
-const state = { user:null, view:'login', levelFilter:'iniciante', q:'', lessons:[], users:[] };
-
-// ---------- INIT ----------
-function initData(){
-  // usuários
-  const users = DB.load('lms_users', []);
-  if(users.length===0){
-    users.push({ id: crypto.randomUUID(), name:'Administrador', email:'admin@academia', pass:'123456', role:'admin', active:true });
-    DB.save('lms_users', users);
-  }
-  state.users = users;
-  // catálogo com migração
-  const cv = localStorage.getItem('lms_version');
-  if(cv !== VERSION){
-    DB.save('lms_content', CONTENT);
-    localStorage.setItem('lms_version', VERSION);
-  }
-  state.lessons = DB.load('lms_content', CONTENT);
-  // sessão
-  const s = DB.load('lms_session', null);
-  if(s){ state.user=s; state.view='home'; }
-}
-
-// ---------- AUTH ----------
-function login(email, pass){
-  const u = state.users.find(x=>x.email.toLowerCase()===email.toLowerCase().trim() && x.pass===pass.trim());
-  if(!u) return {ok:false, msg:'Credenciais inválidas.'};
-  if(!u.active) return {ok:false, msg:'Acesso ainda não liberado.'};
-  state.user = { id:u.id, name:u.name, email:u.email, role:u.role };
-  DB.save('lms_session', state.user);
-  return {ok:true};
-}
-function logout(){ state.user=null; localStorage.removeItem('lms_session'); route('login'); }
-
-// ---------- ROUTER ----------
-function route(view, params={}){
-  state.view = view;
-  if(view==='lesson' && params.id){ state.current = state.lessons.find(x=>x.id===params.id) || null; }
-  render();
-}
-
-// ---------- HELPERS/UI ----------
-const $ = (sel, el=document)=> el.querySelector(sel);
-const $$ = (sel, el=document)=> [...el.querySelectorAll(sel)];
-function labelLevel(l){ return l==='iniciante'?'Iniciante': l==='intermediario'?'Intermediário':'Avançado'; }
-function filtered(){
-  const q = state.q.toLowerCase();
-  return state.lessons
-    .filter(l=>l.level===state.levelFilter)
-    .filter(l=> !q || l.title.toLowerCase().includes(q) || l.category.toLowerCase().includes(q))
-    .sort((a,b)=> a.category.localeCompare(b.category) || a.title.localeCompare(b.title));
-}
-
-function Sidebar(){
-  const u = state.user;
-  const admin = u?.role==='admin' ? `
-  <div class="badge" style="margin-top:12px">Admin</div>
-  <div class="menu">
-    <button onclick="route('admin_users')" id="m_users">👥 Alunos</button>
-    <button onclick="upgradeCatalog()" id="m_upgrade">🔄 Atualizar catálogo</button>
-  </div>` : '';
-  return `
-  <aside class="sidebar">
-    <div class="logo"><span>🤟</span> Academia de Libras</div>
-    <div class="badge">Navegação</div>
-    <div class="menu" style="margin-top:6px">
-      <button onclick="route('home')" id="m_home">🏠 Início</button>
-      <button onclick="route('profile')" id="m_profile">🙍 Perfil</button>
-      <button onclick="logout()">🚪 Sair</button>
-    </div>
-    ${admin}
-    <div class="badge" style="margin-top:12px">Níveis</div>
-    <div class="levels" id="lvlBtns" style="margin-top:8px">
-      <button data-l="iniciante">Iniciante</button>
-      <button data-l="intermediario">Intermediário</button>
-      <button data-l="avancado">Avançado</button>
-    </div>
-    <div class="search" style="margin-top:10px">
-      <input id="q" placeholder="Buscar por título ou categoria" value="${state.q}"/>
-    </div>
-  </aside>`;
-}
-
-function Home(){
-  const items = filtered().map(Tile).join('') || `<div class="muted">Nenhum item encontrado.</div>`;
-  return `
-  <main class="content">
-    <div class="card">
-      <div class="hd">
-        <div class="row" style="align-items:center">
-          <h2 style="margin:0">Plano de estudo — <span class="muted">${labelLevel(state.levelFilter)}</span></h2>
-          <span class="pill">Itens: ${filtered().length}</span>
+<header>
+    <h1>Academia de Libras</h1>
+</header>
+<nav>
+    <a href="#iniciante">Iniciante</a>
+    <a href="#intermediario">Intermediário</a>
+    <a href="#avancado">Avançado</a>
+    <a href="#planos">Planos</a>
+    <a href="#assinatura">Minha Assinatura</a>
+</nav>
+<div class="container">
+    <section id="iniciante">
+        <h2>Módulo Iniciante</h2>
+        <div class="card">
+            <h3>Alfabeto em Libras</h3>
+            <a href="https://www.youtube.com/watch?v=YeefpvwTfzA" target="_blank">
+                <img src="https://img.youtube.com/vi/YeefpvwTfzA/0.jpg" class="video-thumb">
+            </a>
         </div>
-        <p class="muted" style="margin-top:8px">Clique em um cartão para abrir a lição. Use <span class="kbd">Buscar</span> para filtrar por palavra. As imagens são miniaturas/ilustrações do tema.</p>
-      </div>
-      <div class="bd">
-        <div class="list" id="list">${items}</div>
-      </div>
-    </div>
-  </main>`;
-}
-
-function Tile(l){
-  return `<div class="tile">
-    <div class="thumb"><img src="${l.img}" alt="${l.title}" onerror="this.src='https://placehold.co/640x360?text=LIBRAS'"/></div>
-    <div class="meta">
-      <div class="title">${l.title}</div>
-      <div class="muted">${l.category} • ${labelLevel(l.level)}</div>
-      <div class="actions">
-        <button class="btn primary" onclick="route('lesson',{id:'${l.id}'})">Abrir</button>
-        <a class="btn ghost" href="${l.video}" target="_blank" rel="noopener">Assistir vídeo-aula</a>
-      </div>
-    </div>
-  </div>`;
-}
-
-function Lesson(){
-  const l = state.current;
-  if(!l) return `<main class="content"><div class="muted">Lição não encontrada.</div></main>`;
-  return `
-  <main class="content">
-    <div class="grid">
-      <div class="card">
-        <div class="hd"><h2 style="margin:0">${l.title}</h2><div class="row" style="margin-top:6px"><span class="tag">${l.category}</span><span class="tag">${labelLevel(l.level)}</span></div></div>
-        <div class="bd" style="display:grid; grid-template-columns:1fr; gap:12px">
-          <div class="thumb"><img src="${l.img}" alt="${l.title}" onerror="this.src='https://placehold.co/640x360?text=LIBRAS'"/></div>
-          <div class="card"><div class="bd"><strong>Descrição</strong><p class="muted" style="margin:6px 0 0">${l.description}</p></div></div>
-          <div class="card"><div class="bd"><strong>Dicas</strong><ul class="muted" style="margin:6px 0 0">${(l.tips||[]).map(x=>`<li>${x}</li>`).join('')}</ul></div></div>
-          <div class="row">
-            <a class="btn primary" href="${l.video}" target="_blank" rel="noopener">▶️ Abrir busca de vídeo</a>
-            <button class="btn" onclick="prev()">⏮️ Anterior</button>
-            <button class="btn" onclick="next()">⏭️ Próxima</button>
-          </div>
+        <div class="card">
+            <h3>Números em Libras</h3>
+            <a href="https://www.youtube.com/watch?v=ubUJ0BFX9lc" target="_blank">
+                <img src="https://img.youtube.com/vi/ubUJ0BFX9lc/0.jpg" class="video-thumb">
+            </a>
         </div>
-      </div>
-      <div class="rightbar">
-        <div class="card"><div class="bd">
-          <strong>Progresso</strong>
-          <div class="row" style="margin-top:8px">
-            <button class="btn" onclick="done('${l.id}')">✔️ Concluída</button>
-            <button class="btn ghost" onclick="fav('${l.id}')">🔖 Favoritar</button>
-          </div>
-          <p id="statusMsg" class="muted" style="margin-top:8px"></p>
-        </div></div>
-      </div>
-    </div>
-  </main>`;
-}
+    </section>
 
-function AdminUsers(){
-  const rows = state.users.map(u=>`
-    <div class="tile" style="flex-direction:row; align-items:center">
-      <div class="meta" style="flex:1">
-        <div class="title">${u.name} <span class="muted">(${u.email})</span></div>
-        <div class="muted">Papel: ${u.role==='admin'?'Admin':'Aluno'} • Status: ${u.active?'Ativo':'Pendente'}</div>
-      </div>
-      <div class="actions" style="padding:10px">
-        <button class="btn ghost" onclick="toggleActive('${u.id}')">${u.active?'Suspender':'Ativar'}</button>
-        <button class="btn ghost" onclick="resetPass('${u.id}')">Resetar senha</button>
-        <button class="btn" style="border-color:#6b1f1f;color:#ffb1b1" onclick="removeUser('${u.id}')">Remover</button>
-      </div>
-    </div>
-  `).join('');
+    <section id="intermediario">
+        <h2>Módulo Intermediário</h2>
+        <div class="card">
+            <h3>Classificadores</h3>
+            <a href="https://www.youtube.com/watch?v=3bYsW8kF5Q4" target="_blank">
+                <img src="https://img.youtube.com/vi/3bYsW8kF5Q4/0.jpg" class="video-thumb">
+            </a>
+        </div>
+        <div class="card">
+            <h3>Verbos direcionais</h3>
+            <a href="https://www.youtube.com/watch?v=ZsQuPAmGkFI" target="_blank">
+                <img src="https://img.youtube.com/vi/ZsQuPAmGkFI/0.jpg" class="video-thumb">
+            </a>
+        </div>
+    </section>
 
-  return `<main class="content">
-    <div class="card"><div class="bd">
-      <h2 style="margin:0">Gerenciar alunos</h2>
-      <p class="muted">Somente você (admin) cadastra e libera acesso.</p>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px">
-        <div><input id="uName" placeholder="Nome"/></div>
-        <div><input id="uEmail" placeholder="E-mail (login)"/></div>
-      </div>
-      <div class="row" style="margin-top:10px">
-        <button class="btn primary" onclick="createUser()">➕ Cadastrar</button>
-        <button class="btn" onclick="upgradeCatalog()">🔄 Atualizar catálogo</button>
-      </div>
-      <div class="bd" style="padding:0; margin-top:10px">
-        ${rows}
-      </div>
-    </div></div>
-  </main>`;
-}
+    <section id="avancado">
+        <h2>Módulo Avançado</h2>
+        <div class="card">
+            <h3>Coesão e coerência</h3>
+            <a href="https://www.youtube.com/watch?v=VdoIH9L4P4g" target="_blank">
+                <img src="https://img.youtube.com/vi/VdoIH9L4P4g/0.jpg" class="video-thumb">
+            </a>
+        </div>
+        <div class="card">
+            <h3>Interpretação</h3>
+            <a href="https://www.youtube.com/watch?v=KPEw8ZEwPYI" target="_blank">
+                <img src="https://img.youtube.com/vi/KPEw8ZEwPYI/0.jpg" class="video-thumb">
+            </a>
+        </div>
+    </section>
 
-function Profile(){
-  const u = state.user;
-  return `<main class="content">
-    <div class="card"><div class="bd">
-      <h2 style="margin:0">Meu perfil</h2>
-      <div class="row" style="margin-top:10px">
-        <input id="pName" value="${u.name}"/>
-        <input id="pEmail" value="${u.email}" disabled/>
-        <input id="pPass" placeholder="Nova senha (opcional)"/>
-        <button class="btn primary" onclick="saveProfile()">Salvar</button>
-      </div>
-    </div></div>
-  </main>`;
-}
+    <section id="planos">
+        <h2>Planos</h2>
+        <div class="planos">
+            <div class="plano">
+                <h3>Básico</h3>
+                <p>R$ 39,90/mês</p>
+                <button onclick="comprar('Básico')">Quero este plano</button>
+            </div>
+            <div class="plano">
+                <h3>Avançado</h3>
+                <p>R$ 49,90/mês</p>
+                <button onclick="comprar('Avançado')">Quero este plano</button>
+            </div>
+        </div>
+    </section>
 
-function LoginView(){
-  return `<div class="login-wrap card">
-    <div class="bd">
-      <div class="logo" style="margin-bottom:10px"><span>🤟</span> <div>Academia de Libras</div></div>
-      <p class="muted">Acesso restrito. <b>Somente o admin</b> cadastra/altera alunos.</p>
-      <div class="row" style="margin-top:12px"><input id="lEmail" placeholder="E-mail" value="admin@academia"/><input id="lPass" type="password" value="123456"/></div>
-      <div class="row" style="margin-top:10px"><button class="btn primary" onclick="doLogin()">Entrar</button></div>
-    </div>
-  </div>`;
-}
-
-// ---------- ACTIONS ----------
-function doLogin(){ const res = login($('#lEmail').value, $('#lPass').value); if(!res.ok){ alert(res.msg); return; } route('home'); }
-function done(id){ const k='done_'+state.user.id; const v=DB.load(k,[]); if(!v.includes(id)) v.push(id); DB.save(k,v); showStatus(id); }
-function fav(id){ const k='fav_'+state.user.id; const v=DB.load(k,[]); if(!v.includes(id)) v.push(id); DB.save(k,v); showStatus(id); }
-function showStatus(id){
-  if(!$('#statusMsg')) return;
-  const done = DB.load('done_'+state.user.id,[]); const fav = DB.load('fav_'+state.user.id,[]);
-  const msgs=[]; if(done.includes(id)) msgs.push('✅ Concluída'); if(fav.includes(id)) msgs.push('🔖 Favorita');
-  $('#statusMsg').textContent = msgs.join(' • ');
-}
-function prev(){ const list = filtered(); const i = list.findIndex(x=>x.id===state.current.id); if(i>0) route('lesson',{id:list[i-1].id}); }
-function next(){ const list = filtered(); const i = list.findIndex(x=>x.id===state.current.id); if(i<list.length-1) route('lesson',{id:list[i+1].id}); }
-// Admin users
-function createUser(){
-  const name=$('#uName').value.trim(), email=$('#uEmail').value.trim();
-  if(!name||!email){ alert('Preencha nome e e-mail.'); return; }
-  if(state.users.some(u=>u.email.toLowerCase()===email.toLowerCase())){ alert('Já existe usuário com este e-mail.'); return; }
-  state.users.push({ id: crypto.randomUUID(), name, email, pass:'libras123', role:'student', active:true });
-  DB.save('lms_users', state.users); render();
-}
-function toggleActive(id){ const u=state.users.find(x=>x.id===id); if(!u) return; u.active=!u.active; DB.save('lms_users', state.users); render(); }
-function resetPass(id){ const u=state.users.find(x=>x.id===id); if(!u) return; const np=prompt('Nova senha para '+u.email); if(!np) return; u.pass=np; DB.save('lms_users', state.users); render(); }
-function removeUser(id){ if(!confirm('Remover usuário?')) return; state.users = state.users.filter(u=>u.id!==id); DB.save('lms_users', state.users); render(); }
-function saveProfile(){ const u=state.users.find(x=>x.id===state.user.id); if(!u) return; const n=$('#pName').value.trim(), p=$('#pPass').value.trim(); if(n){u.name=n; state.user.name=n;} if(p){u.pass=p;} DB.save('lms_users', state.users); DB.save('lms_session', state.user); alert('Perfil atualizado.'); }
-function upgradeCatalog(){ DB.save('lms_content', CONTENT); localStorage.setItem('lms_version', VERSION); state.lessons = CONTENT; render(); alert('Catálogo atualizado!'); }
-
-// ---------- RENDER ----------
-function SidebarActivate(){
-  $$('#lvlBtns button').forEach(b=>{
-    if(b.dataset.l === state.levelFilter) b.classList.add('active');
-    b.addEventListener('click', ()=>{ state.levelFilter=b.dataset.l; render(); });
-  });
-  if($('#q')) $('#q').addEventListener('input', (e)=>{ state.q=e.target.value; $('#list').innerHTML = filtered().map(Tile).join(''); });
-  if($('#m_home') && state.view==='home') $('#m_home').classList.add('active');
-  if($('#m_profile') && state.view==='profile') $('#m_profile').classList.add('active');
-  if($('#m_users') && state.view==='admin_users') $('#m_users').classList.add('active');
-  if($('#m_upgrade')) $('#m_upgrade').classList.add('active');
-}
-function render(){
-  const root = document.getElementById('app');
-  if(!state.user){ root.innerHTML = LoginView(); return; }
-  const main = state.view==='home' ? Home() :
-               state.view==='lesson' ? Lesson() :
-               state.view==='admin_users' ? AdminUsers() :
-               state.view==='profile' ? Profile() : Home();
-  root.innerHTML = `<div class="app">${Sidebar()}${main}</div>`;
-  SidebarActivate();
-  if(state.view==='lesson' && state.current){ showStatus(state.current.id); }
-}
-
-// ---------- BOOT ----------
-initData();
-render();
-</script>
+    <section id="assinatura">
+        <h2>Minha Assinatura</h2>
+        <p>Nenhuma assinatura ativa.</p>
+    </section>
+</div>
 </body>
 </html>
