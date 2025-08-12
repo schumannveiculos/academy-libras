@@ -1,132 +1,150 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Academia Libras</title>
+<title>Curso Completo de LIBRAS</title>
 <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
-    header { background: #0073e6; color: #fff; padding: 10px 20px; text-align: center; }
-    nav { background: #333; color: #fff; display: flex; justify-content: space-around; padding: 10px; }
-    nav a { color: #fff; text-decoration: none; padding: 5px 10px; }
-    nav a:hover { background: #555; }
-    .container { padding: 20px; }
-    .card { background: #fff; border-radius: 5px; margin-bottom: 15px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .card h3 { margin-top: 0; }
-    .video-thumb { width: 100%; max-width: 320px; }
-    .planos { display: flex; gap: 20px; }
-    .plano { background: #fff; padding: 15px; border-radius: 5px; flex: 1; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .plano button { background: #0073e6; color: #fff; border: none; padding: 10px; cursor: pointer; border-radius: 5px; }
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #0b0f14;
+        color: white;
+        display: flex;
+    }
+    .sidebar {
+        width: 250px;
+        background: rgba(20, 20, 20, 0.8);
+        backdrop-filter: blur(8px);
+        padding-top: 20px;
+        position: fixed;
+        height: 100%;
+        overflow-y: auto;
+        transition: width 0.3s;
+    }
+    .sidebar.minimized {
+        width: 60px;
+    }
+    .sidebar button.toggle {
+        background: none;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        margin: 10px;
+    }
+    .sidebar h2 {
+        text-align: center;
+    }
+    .sidebar a {
+        display: block;
+        padding: 10px;
+        color: white;
+        text-decoration: none;
+    }
+    .sidebar a:hover {
+        background: #333;
+    }
+    .content {
+        margin-left: 250px;
+        padding: 20px;
+        flex: 1;
+        transition: margin-left 0.3s;
+    }
+    .content.minimized {
+        margin-left: 60px;
+    }
+    .module {
+        background: #141a20;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    iframe {
+        width: 100%;
+        height: 315px;
+    }
 </style>
-<script>
-let aluno = { nome: '', email: '', plano: '', credencial: '' };
-
-function comprar(plano) {
-    let nome = prompt("Digite seu nome:");
-    let email = prompt("Digite seu email:");
-    if(nome && email) {
-        aluno.nome = nome;
-        aluno.email = email;
-        aluno.plano = plano;
-        aluno.credencial = "LIB-" + Math.floor(Math.random()*1000000);
-        alert("Compra confirmada!\nPlano: " + plano + "\nCredencial: " + aluno.credencial);
-        mostrarAssinatura();
-    }
-}
-
-function mostrarAssinatura() {
-    const area = document.getElementById("assinatura");
-    if(aluno.nome) {
-        area.innerHTML = "<h3>Minha Assinatura</h3>" +
-                         "<p>Nome: " + aluno.nome + "</p>" +
-                         "<p>Email: " + aluno.email + "</p>" +
-                         "<p>Plano: " + aluno.plano + "</p>" +
-                         "<p>Credencial: " + aluno.credencial + "</p>";
-    }
-}
-</script>
 </head>
 <body>
-<header>
-    <h1>Academia de Libras</h1>
-</header>
-<nav>
-    <a href="#iniciante">Iniciante</a>
-    <a href="#intermediario">Intermediário</a>
-    <a href="#avancado">Avançado</a>
-    <a href="#planos">Planos</a>
-    <a href="#assinatura">Minha Assinatura</a>
-</nav>
-<div class="container">
-    <section id="iniciante">
-        <h2>Módulo Iniciante</h2>
-        <div class="card">
-            <h3>Alfabeto em Libras</h3>
-            <a href="https://www.youtube.com/watch?v=YeefpvwTfzA" target="_blank">
-                <img src="https://img.youtube.com/vi/YeefpvwTfzA/0.jpg" class="video-thumb">
-            </a>
-        </div>
-        <div class="card">
-            <h3>Números em Libras</h3>
-            <a href="https://www.youtube.com/watch?v=ubUJ0BFX9lc" target="_blank">
-                <img src="https://img.youtube.com/vi/ubUJ0BFX9lc/0.jpg" class="video-thumb">
-            </a>
-        </div>
-    </section>
 
-    <section id="intermediario">
-        <h2>Módulo Intermediário</h2>
-        <div class="card">
-            <h3>Classificadores</h3>
-            <a href="https://www.youtube.com/watch?v=3bYsW8kF5Q4" target="_blank">
-                <img src="https://img.youtube.com/vi/3bYsW8kF5Q4/0.jpg" class="video-thumb">
-            </a>
-        </div>
-        <div class="card">
-            <h3>Verbos direcionais</h3>
-            <a href="https://www.youtube.com/watch?v=ZsQuPAmGkFI" target="_blank">
-                <img src="https://img.youtube.com/vi/ZsQuPAmGkFI/0.jpg" class="video-thumb">
-            </a>
-        </div>
-    </section>
-
-    <section id="avancado">
-        <h2>Módulo Avançado</h2>
-        <div class="card">
-            <h3>Coesão e coerência</h3>
-            <a href="https://www.youtube.com/watch?v=VdoIH9L4P4g" target="_blank">
-                <img src="https://img.youtube.com/vi/VdoIH9L4P4g/0.jpg" class="video-thumb">
-            </a>
-        </div>
-        <div class="card">
-            <h3>Interpretação</h3>
-            <a href="https://www.youtube.com/watch?v=KPEw8ZEwPYI" target="_blank">
-                <img src="https://img.youtube.com/vi/KPEw8ZEwPYI/0.jpg" class="video-thumb">
-            </a>
-        </div>
-    </section>
-
-    <section id="planos">
-        <h2>Planos</h2>
-        <div class="planos">
-            <div class="plano">
-                <h3>Básico</h3>
-                <p>R$ 39,90/mês</p>
-                <button onclick="comprar('Básico')">Quero este plano</button>
-            </div>
-            <div class="plano">
-                <h3>Avançado</h3>
-                <p>R$ 49,90/mês</p>
-                <button onclick="comprar('Avançado')">Quero este plano</button>
-            </div>
-        </div>
-    </section>
-
-    <section id="assinatura">
-        <h2>Minha Assinatura</h2>
-        <p>Nenhuma assinatura ativa.</p>
-    </section>
+<div class="sidebar" id="sidebar">
+    <button class="toggle" onclick="toggleSidebar()">☰</button>
+    <h2>LIBRAS</h2>
+    <a href="#" onclick="showModule('intro')">Introdução</a>
+    <a href="#" onclick="showModule('alfabeto')">Alfabeto</a>
+    <a href="#" onclick="showModule('numeros')">Números</a>
+    <a href="#" onclick="showModule('saudacoes')">Saudações</a>
+    <a href="#" onclick="showModule('intermediario')">Intermediário</a>
+    <a href="#" onclick="showModule('avancado')">Avançado</a>
+    <a href="#" onclick="showConfig()">Configurações</a>
 </div>
+
+<div class="content" id="content">
+    <h1>Bem-vindo ao Curso Completo de LIBRAS</h1>
+    <p>Escolha um módulo na barra lateral para começar.</p>
+</div>
+
+<script>
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('minimized');
+    document.getElementById('content').classList.toggle('minimized');
+}
+
+function showModule(module) {
+    let content = document.getElementById('content');
+    let modules = {
+        intro: `
+            <div class="module">
+                <h2>Introdução ao LIBRAS</h2>
+                <iframe src="https://www.youtube.com/embed/VIDEO_ID_1" frameborder="0" allowfullscreen></iframe>
+            </div>`,
+        alfabeto: `
+            <div class="module">
+                <h2>Alfabeto em LIBRAS</h2>
+                <iframe src="https://www.youtube.com/embed/VIDEO_ID_2" frameborder="0" allowfullscreen></iframe>
+            </div>`,
+        numeros: `
+            <div class="module">
+                <h2>Números em LIBRAS</h2>
+                <iframe src="https://www.youtube.com/embed/VIDEO_ID_3" frameborder="0" allowfullscreen></iframe>
+            </div>`,
+        saudacoes: `
+            <div class="module">
+                <h2>Saudações e Expressões Básicas</h2>
+                <iframe src="https://www.youtube.com/embed/VIDEO_ID_4" frameborder="0" allowfullscreen></iframe>
+            </div>`,
+        intermediario: `
+            <div class="module">
+                <h2>LIBRAS - Nível Intermediário</h2>
+                <iframe src="https://www.youtube.com/embed/VIDEO_ID_5" frameborder="0" allowfullscreen></iframe>
+            </div>`,
+        avancado: `
+            <div class="module">
+                <h2>LIBRAS - Nível Avançado</h2>
+                <iframe src="https://www.youtube.com/embed/VIDEO_ID_6" frameborder="0" allowfullscreen></iframe>
+            </div>`
+    };
+    content.innerHTML = modules[module];
+}
+
+function showConfig() {
+    document.getElementById('content').innerHTML = `
+        <div class="module">
+            <h2>Configurações da Conta</h2>
+            <label>Login:</label><br><input type="text" value="usuario_padrao"><br>
+            <label>Senha:</label><br><input type="password" value="123456"><br><br>
+            <button onclick="alert('Dados salvos!')">Salvar</button>
+            <br><br>
+            <label>Tipo de conta:</label>
+            <select>
+                <option>Aluno</option>
+                <option>Administrador</option>
+            </select>
+        </div>`;
+}
+</script>
+
 </body>
 </html>
